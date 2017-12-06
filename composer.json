@@ -1,0 +1,16 @@
+{
+    "name": "sen/mchpay",
+    "description": "微信企业付款",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "sen",
+            "email": "626512443@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": { "merchpay\\": "src" }
+    }
+}
