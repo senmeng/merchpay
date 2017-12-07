@@ -75,15 +75,16 @@ class wxpay{
         $content = common::xml2array($res);  
         
         if($content['return_code'] == 'FAIL'){  
-            return ['return_code'=>$content['return_code'], 'msg'=>$content['return_msg']];  
+            return ['return_code'=>$content['return_code'], 'msg'=>$content['return_msg'],'err_code'=>$content['err_code'],'err_code_des'=>$content['err_code_des']];  
         }  
         if($content['result_code'] == 'FAIL'){  
-            return ['return_code'=>$content['err_code'], 'msg'=>$content['err_code_des']];  
+            return ['return_code'=>$content['err_code'], 'msg'=>$content['err_code_des'],'err_code'=>$content['err_code'],'err_code_des'=>$content['err_code_des']];  
         }  
         $resdata = array(  
             'return_code'      => $content['return_code'],  
             'result_code'      => $content['result_code'],  
-            'nonce_str'        => $content['nonce_str'],  
+            'err_code'         => $content['err_code'],
+            'err_code_des'     => $content['err_code_des'],
             'partner_trade_no' => $content['partner_trade_no'],  
             'payment_no'       => $content['payment_no'],  
             'payment_time'     => $content['payment_time'],  

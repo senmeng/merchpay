@@ -37,7 +37,7 @@ class bouns{
      * @param string $desc      描述 
      * @return string   XML 结构的字符串 
      */  
-    public function bouns($openid='',$trade_no='',$money='',$desc=''){
+    public function pay($openid='',$trade_no='',$money='',$desc=''){
         
         if(empty($openid) || empty($trade_no) || empty($money)){
             return false;
@@ -53,6 +53,7 @@ class bouns{
             'act_name' => $this->act_name, //活动名称  
             'total_amount'    => $money * 100, //付款金额单位为分  
             'total_num'    => $this->total_num,
+            'wishing' => $this->wishing,
             'remark'      => $desc,  
             'scene_id' => $scene_id,
             'client_ip' => common::getIp()  
@@ -72,7 +73,7 @@ class bouns{
 
         //付款结果分析  
         $content = common::xml2array($res);  
-        
+
         if($content['return_code'] == 'FAIL'){  
             return ['return_code'=>$content['return_code'], 'msg'=>$content['return_msg']];  
         }  
@@ -81,11 +82,9 @@ class bouns{
         }  
         $resdata = array(  
             'return_code'      => $content['return_code'],  
-            'result_code'      => $content['result_code'],  
-            'nonce_str'        => $content['nonce_str'],  
-            'partner_trade_no' => $content['partner_trade_no'],  
-            'payment_no'       => $content['payment_no'],  
-            'payment_time'     => $content['payment_time'],  
+            'result_code'      => $content['result_code'], 
+            'partner_trade_no' => $content['mch_billno'],  
+            'payment_no'       => $content['send_listid'] 
         );  
         return $resdata;  
 
