@@ -3,7 +3,7 @@ namespace merchpay;
 
 use merchpay\common;
 
-class bouns{
+class fissionBouns{
     
     private $total_num = 1;
     private $error_code = '';
@@ -38,6 +38,7 @@ class bouns{
             're_openid'    => $openid,  
             'check_name'=> $this->check_name, //OPTION_CHECK不强制校验真实姓名, FORCE_CHECK：强制 NO_CHECK：  
             'act_name' => $this->act_name, //活动名称  
+            'amt_type' => $this->amt_type, //红包金额设置方式  
             'total_amount'    => $money * 100, //付款金额单位为分  
             'total_num'    => $this->total_num,
             'wishing' => $this->wishing,
@@ -51,7 +52,7 @@ class bouns{
       
         //构造XML数据  
         $xmldata = common::array2xml($data);  
-        $url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';  
+        $url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendgroupredpack';  
         //发送post请求  
         $res = common::curl_post_ssl($url, $xmldata,$second=30,[],$this->sslcert_path,$this->sslkey_path);  
         if(!$res){  

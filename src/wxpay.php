@@ -4,23 +4,10 @@ namespace merchpay;
 use merchpay\common;
 
 class wxpay{
-    
-    private $appid = '';
-    private $mchid = '';
-    private $key = '';
-    private $appsecret = '';
+ 
     private $check_name = 'FORCE_CHECK';
-    private $real_name = '';//真实姓名    
-    private $sslcert_path = '';
-    private $sslkey_path = '';
     private $error_code = '';
     private $error_msg = '';
-
-    public function __construct($appid='',$mchid=''){
-
-        $this->appid = $appid;
-        $this->mchid = $mchid;
-    }
 
     //__set()方法用来设置私有属性 
     public function __set($name,$value){ 
@@ -42,9 +29,6 @@ class wxpay{
      */  
     public function pay($openid='',$trade_no='',$money='',$desc=''){
         
-        if(empty($openid) || empty($trade_no) || empty($money)){
-            return false;
-        }
         $data = array(  
             'mch_appid' => $this->appid,  
             'mchid'     => $this->mchid,  
@@ -60,7 +44,7 @@ class wxpay{
         );  
         
         //生成签名  
-        $data['sign'] = $this->MakeSign($data); 
+        $data['sign'] = common::MakeSign($data,$this->key); 
       
         //构造XML数据  
         $xmldata = common::array2xml($data);  
@@ -93,22 +77,4 @@ class wxpay{
 
     }
 
-    /**
-	 * 生成签名
-	 * @return 签名，本函数不覆盖sign成员变量，如要设置签名需要调用SetSign方法赋值
-	 */
-	public function MakeSign($data)
-	{
-		//签名步骤一：按字典序排序参数
-		ksort($data);
-        $string = common::ToUrlParams($data);
-        
-		//签名步骤二：在string后加入KEY
-		$string = $string . "&key=".$this->key;
-		//签名步骤三：MD5加密
-		$string = md5($string);
-		//签名步骤四：所有字符转为大写
-		$result = strtoupper($string);
-		return $result;
-	}
 }
