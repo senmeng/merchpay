@@ -32,8 +32,7 @@ class wxpay{
         $data = array(  
             'mch_appid' => $this->appid,  
             'mchid'     => $this->mchid,  
-            'nonce_str' => common::getNonceStr(16),
-            //'device_info' => '1000',  
+            'nonce_str' => common::getNonceStr(16), 
             'partner_trade_no' => $trade_no, //商户订单号，需要唯一  
             'openid'    => $openid,  
             'check_name'=> $this->check_name, //OPTION_CHECK不强制校验真实姓名, FORCE_CHECK：强制 NO_CHECK：  
