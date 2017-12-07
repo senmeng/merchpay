@@ -10,9 +10,13 @@ class wxpay{
     private $key = '';
     private $appsecret = '';
     private $check_name = 'FORCE_CHECK';
-    private $real_name = '';//真实姓名
+    private $real_name = '';//真实姓名    
+    private $sslcert_path = '';
+    private $sslkey_path = '';
+    private $error_code = '';
+    private $error_msg = '';
 
-    public function __construct($appid,$mchid){
+    public function __construct($appid='',$mchid=''){
 
         $this->appid = $appid;
         $this->mchid = $mchid;
@@ -36,8 +40,11 @@ class wxpay{
      * @param string $desc      描述 
      * @return string   XML 结构的字符串 
      */  
-    public function pay($openid,$trade_no,$money,$desc){
-       
+    public function pay($openid='',$trade_no='',$money='',$desc=''){
+        
+        if(empty($openid) || empty($trade_no) || empty($money)){
+            return false;
+        }
         $data = array(  
             'mch_appid' => $this->appid,  
             'mchid'     => $this->mchid,  
@@ -51,35 +58,35 @@ class wxpay{
             'desc'      => $desc,  
             'spbill_create_ip' => common::getIp()  
         );  
-         
+        
         //生成签名  
-        $data['sign'] = $this->MakeSign($data);  
+        $data['sign'] = $this->MakeSign($data); 
+      
         //构造XML数据  
         $xmldata = common::array2xml($data);  
         $url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';  
         //发送post请求  
-        $res = common::curl_post_ssl($url, $xmldata);  
+        $res = common::curl_post_ssl($url, $xmldata,$second=30,[],$this->sslcert_path,$this->sslkey_path);  
         if(!$res){  
-            return array('status'=>1, 'msg'=>"Can't connect the server" );  
+            return ['code'=>403, 'msg'=>"Can't connect the server"];  
         }  
-        // 这句file_put_contents是用来查看服务器返回的结果 测试完可以删除了  
-        file_put_contents(APP_ROOT.'/Api/wxpay/logs/log2.txt',$res,FILE_APPEND);  
-          
+
         //付款结果分析  
-        $content = self::xml2array($res);  
-        if(strval($content['return_code']) == 'FAIL'){  
-            return array('status'=>1, 'msg'=>strval($content['return_msg']));  
+        $content = common::xml2array($res);  
+        
+        if($content['return_code'] == 'FAIL'){  
+            return ['return_code'=>$content['return_code'], 'msg'=>$content['return_msg']];  
         }  
-        if(strval($content['result_code']) == 'FAIL'){  
-            return array('status'=>1, 'msg'=>strval($content['err_code']),':'.strval($content['err_code_des']));  
+        if($content['result_code'] == 'FAIL'){  
+            return ['return_code'=>$content['err_code'], 'msg'=>$content['err_code_des']];  
         }  
         $resdata = array(  
-            'return_code'      => strval($content['return_code']),  
-            'result_code'      => strval($content['result_code']),  
-            'nonce_str'        => strval($content['nonce_str']),  
-            'partner_trade_no' => strval($content['partner_trade_no']),  
-            'payment_no'       => strval($content['payment_no']),  
-            'payment_time'     => strval($content['payment_time']),  
+            'return_code'      => $content['return_code'],  
+            'result_code'      => $content['result_code'],  
+            'nonce_str'        => $content['nonce_str'],  
+            'partner_trade_no' => $content['partner_trade_no'],  
+            'payment_no'       => $content['payment_no'],  
+            'payment_time'     => $content['payment_time'],  
         );  
         return $resdata;  
 
@@ -93,7 +100,8 @@ class wxpay{
 	{
 		//签名步骤一：按字典序排序参数
 		ksort($data);
-		$string = common::ToUrlParams($data);
+        $string = common::ToUrlParams($data);
+        
 		//签名步骤二：在string后加入KEY
 		$string = $string . "&key=".$this->key;
 		//签名步骤三：MD5加密

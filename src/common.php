@@ -66,7 +66,7 @@ class common{
      * @param string $xml
      * @throws WxPayException
      */
-	public static function xml2array($data)
+	public static function xml2array($xml)
 	{	
         //将XML转为array
         //禁止引用外部xml实体
@@ -97,7 +97,7 @@ class common{
      * 企业付款发起请求 
      * 此函数来自:https://pay.weixin.qq.com/wiki/doc/api/download/cert.zip 
      */  
-    static function curl_post_ssl($url, $xmldata, $second=30,$aHeader=array()){  
+    static function curl_post_ssl($url, $xmldata, $second=30,$aHeader=array(),$sslcert_path,$sslkey_path){  
         $ch = curl_init();  
         //超时时间  
         curl_setopt($ch,CURLOPT_TIMEOUT,$second);  
@@ -114,10 +114,10 @@ class common{
         //第一种方法，cert 与 key 分别属于两个.pem文件  
         //默认格式为PEM，可以注释  
         curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');  
-        curl_setopt($ch,CURLOPT_SSLCERT,WxPayConfig::SSLCERT_PATH);  
+        curl_setopt($ch,CURLOPT_SSLCERT,$sslcert_path);  
         //默认格式为PEM，可以注释  
         curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');  
-        curl_setopt($ch,CURLOPT_SSLKEY,WxPayConfig::SSLKEY_PATH);  
+        curl_setopt($ch,CURLOPT_SSLKEY,$sslkey_path);  
         
         //第二种方式，两个文件合成一个.pem文件  
         //curl_setopt($ch,CURLOPT_SSLCERT,getcwd().'/all.pem');  
